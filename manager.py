@@ -8,7 +8,7 @@ class actions:
         self.file = file
         self.secure = secure
         with open(key_file, 'r') as infile:
-            self.key = json.load(infile)
+            self.key = json.load(infile)['key']
 
     def list_entries(self, data):
         return {print(k + ':' + data[k]) for k in data.keys()}
@@ -16,7 +16,7 @@ class actions:
     def del_entry(self, data):
         if(self.key):
             print('which usr')
-            usr = input()
+            usr = secure.encode(self.key, input())
             if usr in data:
                 data.pop(usr)
                 self.json_write(data)
@@ -27,9 +27,9 @@ class actions:
     def get_pass(self, data):
         if(self.key):
             print('get pwd for usr:')
-            usr = secure.encode(self.key['key'], input())
+            usr = secure.encode(self.key, input())
             if usr in data:
-                print(secure.decode(self.key['key'], usr) + ':' + secure.decode(self.key['key'], data[usr]))
+                print(secure.decode(self.key, usr) + ':' + secure.decode(self.key, data[usr]))
             else:
                 print('no key found')
         return
@@ -41,7 +41,7 @@ class actions:
             if usr in data:
                 print('already has key')
             else:
-                data[secure.encode(self.key['key'], usr)] = secure.encode(self.key['key'], pwd)
+                data[secure.encode(self.key, usr)] = secure.encode(self.key, pwd)
                 self.json_write(data)
         return
         
