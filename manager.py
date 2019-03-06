@@ -1,10 +1,14 @@
 import re 
 import os
 import json
+from secure import secure
 
 class actions:
-    def __init__(self, file):
+    def __init__(self, file, key_file):
         self.file = file
+        self.secure = secure
+        with open(key_file, 'r') as infile:
+            self.key = json.load(infile)
 
     def list_entries(self, data):
         for k in data.keys():
@@ -38,7 +42,7 @@ class actions:
         if usr in data:
             print('already has key')
         else:
-            data[usr] = pwd
+            data[usr] = secure.encode(self.key['key'], pwd)
 
         self.json_write(data)
         return
@@ -52,19 +56,19 @@ class actions:
         if os.path.isfile(self.file):
             with open(self.file, 'r') as infile:
                 data = json.load(infile)
-                while True:
-                    print('actions: [i]nsert [g]et [l]ist [d]el')
-                    act = input()
-                    if act == 'i': 
-                        self.insert_pass(data)
-                    if act == 'g': 
-                        self.get_pass(data)
-                    if act == 'l': 
-                        self.list_entries(data)
-                    if act == 'd': 
-                        self.del_entry(data)
-                    if act == '':
-                        break
-                return
+            while True:
+                print('actions: [i]nsert [g]et [l]ist [d]el')
+                act = input()
+                if act == 'i': 
+                    self.insert_pass(data)
+                if act == 'g': 
+                    self.get_pass(data)
+                if act == 'l': 
+                    self.list_entries(data)
+                if act == 'd': 
+                    self.del_entry(data)
+                if act == '':
+                    break
         else:
             print('no file found')
+        return
