@@ -11,40 +11,38 @@ class actions:
             self.key = json.load(infile)
 
     def list_entries(self, data):
-        for k in data.keys():
-            usr, pwd = k, data[k]
-            print(usr + ':' + pwd)
-        return
+        return {print(k + ':' + data[k]) for k in data.keys()}
 
     def del_entry(self, data):
-       #print('insert master pass')
-        print('which usr')
-        usr = input()
-        if usr in data:
-            data.pop(usr)
-        else:
-            print('no key found')
-        self.json_write(data)
+        if(self.key):
+            print('which usr')
+            usr = input()
+            if usr in data:
+                data.pop(usr)
+                self.json_write(data)
+            else:
+                print('no key found')
         return
 
     def get_pass(self, data):
-        print('get pwd for usr:')
-        usr = input()
-        if usr in data:
-            print(usr + ':' + data[usr])
-        else:
-            print('no key found')
+        if(self.key):
+            print('get pwd for usr:')
+            usr = secure.encode(self.key['key'], input())
+            if usr in data:
+                print(secure.decode(self.key['key'], usr) + ':' + secure.decode(self.key['key'], data[usr]))
+            else:
+                print('no key found')
         return
 
     def insert_pass(self, data):
-        print('insert usr:pwd') 
-        usr, pwd = map(str, input().split(':'))
-        if usr in data:
-            print('already has key')
-        else:
-            data[usr] = secure.encode(self.key['key'], pwd)
-
-        self.json_write(data)
+        if(self.key):
+            print('insert usr:pwd') 
+            usr, pwd = map(str, input().split(':'))
+            if usr in data:
+                print('already has key')
+            else:
+                data[secure.encode(self.key['key'], usr)] = secure.encode(self.key['key'], pwd)
+                self.json_write(data)
         return
         
     def json_write(self, data):
